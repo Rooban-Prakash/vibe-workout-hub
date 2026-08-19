@@ -10,9 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 export const WeightTracker = () => {
   const [weight, setWeight] = useState('');
   const [recentWeights, setRecentWeights] = useState([
-    { date: '2024-06-24', weight: 165.5 },
-    { date: '2024-06-23', weight: 166.0 },
-    { date: '2024-06-22', weight: 166.2 },
+    { date: '2024-06-24', weight: 75.1 },
+    { date: '2024-06-23', weight: 75.3 },
+    { date: '2024-06-22', weight: 75.4 },
   ]);
   const { toast } = useToast();
 
@@ -30,7 +30,7 @@ export const WeightTracker = () => {
     
     toast({
       title: "Weight logged!",
-      description: `${weight} lbs recorded for today`,
+      description: `${weight} kg recorded for today`,
     });
 
     console.log('Weight entry:', newEntry);
@@ -47,7 +47,7 @@ export const WeightTracker = () => {
       <CardContent className="space-y-4">
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <Label htmlFor="weight">Today's Weight (lbs)</Label>
+            <Label htmlFor="weight">Today's Weight (kg)</Label>
             <div className="flex gap-2">
               <Input
                 id="weight"
@@ -71,7 +71,7 @@ export const WeightTracker = () => {
             {recentWeights.map((entry, index) => (
               <div key={index} className="flex justify-between text-sm py-1 px-2 bg-gray-50 rounded">
                 <span>{new Date(entry.date).toLocaleDateString()}</span>
-                <span className="font-medium">{entry.weight} lbs</span>
+                <span className="font-medium">{entry.weight} kg</span>
               </div>
             ))}
           </div>
