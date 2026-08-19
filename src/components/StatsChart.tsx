@@ -10,12 +10,12 @@ export const StatsChart = () => {
 
   // Sample data - in a real app, this would come from your data store
   const weightData = [
-    { date: '6/20', weight: 167.2 },
-    { date: '6/21', weight: 166.8 },
-    { date: '6/22', weight: 166.2 },
-    { date: '6/23', weight: 166.0 },
-    { date: '6/24', weight: 165.5 },
-    { date: '6/25', weight: 165.3 },
+    { date: '6/20', weight: 75.8 },
+    { date: '6/21', weight: 75.6 },
+    { date: '6/22', weight: 75.4 },
+    { date: '6/23', weight: 75.3 },
+    { date: '6/24', weight: 75.1 },
+    { date: '6/25', weight: 75.0 },
   ];
 
   const moodData = [
@@ -53,7 +53,7 @@ export const StatsChart = () => {
                 stroke="#3B82F6" 
                 strokeWidth={3}
                 dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                name="Weight (lbs)"
+                name="Weight (kg)"
               />
             </LineChart>
           </ResponsiveContainer>
