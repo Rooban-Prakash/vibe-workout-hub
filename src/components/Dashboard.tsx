@@ -6,7 +6,10 @@ import { WorkoutLogger } from './WorkoutLogger';
 import { MoodTracker } from './MoodTracker';
 import { HabitTracker } from './HabitTracker';
 import { StatsChart } from './StatsChart';
-import { TrendingUp, Calendar, Heart, Target } from 'lucide-react';
+import { SheetsPanel } from './SheetsPanel';
+import { TrendingUp, Calendar, Heart, Target, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 export const Dashboard = () => {
   const today = new Date().toLocaleDateString('en-US', { 
@@ -20,9 +23,18 @@ export const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="relative text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Vibe Workout Hub</h1>
           <p className="text-lg text-gray-600">{today}</p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-0 top-0"
+            onClick={() => supabase.auth.signOut()}
+          >
+            <LogOut className="h-4 w-4 mr-1" />
+            Sign out
+          </Button>
         </div>
 
         {/* Stats Overview */}
@@ -83,6 +95,7 @@ export const Dashboard = () => {
             <WorkoutLogger />
           </div>
           <div className="space-y-6">
+            <SheetsPanel />
             <MoodTracker />
             <HabitTracker />
           </div>

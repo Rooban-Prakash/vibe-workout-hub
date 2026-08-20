@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Activity, Plus, Trash2, CheckCircle2, CircleDashed, Dumbbell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useSheetWorkouts, useAppendToSheet, useSheetStatus } from '@/hooks/useSheets';
 
 interface Exercise {
   id: string;
@@ -28,14 +29,33 @@ export const WorkoutLogger = () => {
   const [weight, setWeight] = useState('');
   const { toast } = useToast();
 
-  const exerciseOptions = [
-    'Bench Press', 'Squats', 'Deadlift', 'Pull-ups', 'Push-ups', 
+  const { data: sheetStatus } = useSheetStatus();
+  const { data: sheetWorkouts } = useSheetWorkouts();
+  const appendToSheet = useAppendToSheet();
+
+  const defaultExercises = [
+    'Bench Press', 'Squats', 'Deadlift', 'Pull-ups', 'Push-ups',
     'Shoulder Press', 'Bicep Curls', 'Tricep Dips', 'Lunges', 'Planks'
   ];
+  const fromSheet = (sheetWorkouts?.length ?? 0) > 0;
+  const exerciseOptions = fromSheet
+    ? Array.from(new Set(sheetWorkouts!.map((w) => w.name)))
+    : defaultExercises;
 
   const muscleGroups = [
     'Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core', 'Full Body', 'Cardio'
   ];
+
+  const handleSelectExercise = (name: string) => {
+    setCurrentExercise(name);
+    const preset = sheetWorkouts?.find((w) => w.name === name);
+    if (preset) {
+      setMuscleGroup(preset.muscleGroup);
+      setSets(String(preset.sets));
+      setReps(String(preset.reps));
+      setWeight(preset.weight ? String(preset.weight) : '');
+    }
+  };
 
   const handleAddExercise = () => {
     if (!currentExercise || !muscleGroup || !sets || !reps) return;
@@ -70,20 +90,32 @@ export const WorkoutLogger = () => {
     setExercises(exercises.filter(ex => ex.id !== id));
   };
 
-  const finishWorkout = () => {
+  const finishWorkout = async () => {
     if (exercises.length === 0) return;
 
-    const workout = {
-      date: new Date().toISOString(),
-      exercises: exercises
-    };
+    const date = new Date().toISOString().split('T')[0];
+
+    if (sheetStatus?.connected && sheetStatus.settings?.spreadsheet_id) {
+      const tab = sheetStatus.settings.workouts_tab ?? 'Workouts';
+      try {
+        await appendToSheet.mutateAsync({
+          tab: `${tab} Log`,
+          values: exercises.map((ex) => [date, ex.name, ex.muscleGroup, ex.sets, ex.reps, ex.weight]),
+        });
+      } catch (error) {
+        toast({
+          title: 'Saved locally only',
+          description: (error as Error).message,
+          variant: 'destructive',
+        });
+      }
+    }
 
     toast({
       title: "Workout completed!",
       description: `Great job! ${exercises.length} exercises logged.`,
     });
 
-    console.log('Workout completed:', workout);
     setWorkoutDone(true);
     setExercises([]);
   };
@@ -145,9 +177,9 @@ export const WorkoutLogger = () => {
 
           <div className="col-span-2">
             <Label>Exercise</Label>
-            <Select value={currentExercise} onValueChange={setCurrentExercise}>
+            <Select value={currentExercise} onValueChange={handleSelectExercise}>
               <SelectTrigger>
-                <SelectValue placeholder="Select exercise" />
+                <SelectValue placeholder={fromSheet ? 'Select from your sheet' : 'Select exercise'} />
               </SelectTrigger>
               <SelectContent>
                 {exerciseOptions.map((exercise) => (
@@ -193,6 +225,10 @@ export const WorkoutLogger = () => {
             />
           </div>
         </div>
+
+        {fromSheet && (
+          <p className="text-xs text-emerald-700">Routine loaded from your Google Sheet.</p>
+        )}
 
         <Button onClick={handleAddExercise} className="w-full" variant="outline">
           <Plus className="h-4 w-4 mr-2" />
