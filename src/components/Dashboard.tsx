@@ -6,6 +6,7 @@ import { WorkoutLogger } from './WorkoutLogger';
 import { MoodTracker } from './MoodTracker';
 import { HabitTracker } from './HabitTracker';
 import { StatsChart } from './StatsChart';
+import { SheetsPanel } from './SheetsPanel';
 import { TrendingUp, Calendar, Heart, Target } from 'lucide-react';
 
 export const Dashboard = () => {
@@ -83,6 +84,7 @@ export const Dashboard = () => {
             <WorkoutLogger />
           </div>
           <div className="space-y-6">
+            <SheetsPanel />
             <MoodTracker />
             <HabitTracker />
           </div>
